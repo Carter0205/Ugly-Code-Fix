@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.11.35312.102
+# Visual Studio Version 18
+VisualStudioVersion = 18.5.11709.299 stable
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UglyClient", "UglyClient.csproj", "{ADC10BBC-0313-4A37-A091-3505B3D19BC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Version2", "..\..\..\Desktop\Software Engineering Component 2 Hand in\Version2Sim-master\Version2Sim-master\Version2.csproj", "{1665C6C9-C627-FCF7-C823-74FC41B01235}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{ADC10BBC-0313-4A37-A091-3505B3D19BC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADC10BBC-0313-4A37-A091-3505B3D19BC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADC10BBC-0313-4A37-A091-3505B3D19BC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1665C6C9-C627-FCF7-C823-74FC41B01235}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1665C6C9-C627-FCF7-C823-74FC41B01235}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1665C6C9-C627-FCF7-C823-74FC41B01235}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1665C6C9-C627-FCF7-C823-74FC41B01235}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
