@@ -5,6 +5,15 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Version2Sim.Tests\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="UnitTestRunner\UnitTestRunner.csproj" />
+  </ItemGroup>
 
 </Project>

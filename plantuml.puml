@@ -1,0 +1,12 @@
+@startuml
+title High-level class diagram
+class Program
+class ConsoleUI
+class ApiClient
+class EnvironmentState
+class TemperatureSensor
+Program --> ConsoleUI
+ConsoleUI --> ApiClient
+ApiClient --> EnvironmentState
+EnvironmentState "1" *-- "3" TemperatureSensor
+@enduml
