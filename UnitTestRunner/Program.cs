@@ -10,14 +10,53 @@ class TestRunner
         {
             Console.WriteLine("Running minimal test harness for Seed (dynamic load)...");
 
-            // Attempt to locate built Version2 assembly under expected bin folder.
-            var candidate = Path.GetFullPath(Path.Combine("..", "..", "..", "Desktop", "Software Engineering Component 2 Hand in", "Version2Sim-master", "Version2Sim-master", "bin", "Debug", "net8.0", "Version2.dll"));
-            if (!File.Exists(candidate))
+            // Try to locate the built Version2 assembly in a few likely locations.
+            string? candidate = null;
+
+            // 1) If environment variable VERSION2_DLL is set, prefer it
+            var env = Environment.GetEnvironmentVariable("VERSION2_DLL");
+            if (!string.IsNullOrEmpty(env) && File.Exists(env)) candidate = env;
+
+            // 2) Look for common relative output paths (bin/Debug/net8.0)
+            if (candidate == null)
             {
-                Console.WriteLine($"Could not find Version2.dll at {candidate}");
+                var checks = new[] {
+                    Path.Combine("..", "Version2Sim-master", "Version2Sim-master", "bin", "Debug", "net8.0", "Version2.dll"),
+                    Path.Combine("..", "..", "Version2Sim-master", "Version2Sim-master", "bin", "Debug", "net8.0", "Version2.dll"),
+                    Path.Combine("..", "..", "..", "Version2Sim-master", "Version2Sim-master", "bin", "Debug", "net8.0", "Version2.dll"),
+                    Path.Combine("..", "..", "..", "..", "Version2Sim-master", "Version2Sim-master", "bin", "Debug", "net8.0", "Version2.dll")
+                };
+                foreach (var c in checks)
+                {
+                    var p = Path.GetFullPath(c);
+                    if (File.Exists(p))
+                    {
+                        candidate = p;
+                        break;
+                    }
+                }
+            }
+
+            // 3) As a last resort, search within the repository tree for Version2.dll (limited depth)
+            if (candidate == null)
+            {
+                try
+                {
+                    var root = Path.GetFullPath(Path.Combine(Directory.GetCurrentDirectory(), ".."));
+                    var files = Directory.GetFiles(root, "Version2.dll", SearchOption.AllDirectories);
+                    if (files.Length > 0) candidate = files[0];
+                }
+                catch { }
+            }
+
+            if (candidate == null || !File.Exists(candidate))
+            {
+                Console.WriteLine("Could not find Version2.dll. Please build the Version2 project first and ensure Version2.dll exists in its bin folder.");
+                Console.WriteLine("You may also set the VERSION2_DLL environment variable to the full path of Version2.dll.");
                 return 2;
             }
 
+            Console.WriteLine($"Loading Version2 assembly from: {candidate}");
             var asm = Assembly.LoadFrom(candidate);
             var seederType = asm.GetType("Version2.Seeding.EnvironmentStateSeeder");
             if (seederType == null)
