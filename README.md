@@ -14,32 +14,35 @@ ConsoleUI → ApiClient → Version2 Server
 
 **After:**
 ```
-ConsoleUI → IDeviceRepository → HttpDeviceRepository → Version2 Server
-                             ↘ MockDeviceRepository (for testing)
-(Loosely coupled, easy to test)
+ConsoleUI → IDeviceRepository → {HttpDeviceRepository OR MockDeviceRepository}
+(Loosely coupled, easy to test, works with or without server)
 ```
 
 ## How to Run
 
-### With Version2 Server
-1. Set both `UglyClient` and `Version2` as startup projects
-2. Set Version2 startup to HTTPS
-3. Press Start (F5)
-4. Version2 opens in Chrome, UglyClient console appears
-5. Use the menu to control devices
-
-### Run Tests
-Tests use MockDeviceRepository and don't need Version2:
-- Open DeviceRepositoryTests.cs
-- Find TestRunner class
-- All 15 tests pass
-
-## Build and Run
-
+### Default: With Mock Data (No Server Needed)
 ```
 dotnet build
 dotnet run
 ```
+Uses MockDeviceRepository. Application runs immediately with simulated device data.
+
+### Advanced: With Version2 Server
+1. Set both `UglyClient` and `Version2` as startup projects
+2. Uncomment HttpDeviceRepository code in Program.cs
+3. Set Version2 startup to HTTPS
+4. Press Start (F5)
+5. Version2 opens in Chrome, UglyClient console appears
+
+See `CONFIGURATION_NOTES.md` for switching between configurations.
+
+## Run Tests
+Tests use MockDeviceRepository and don't need Version2:
+```
+dotnet build
+# Then open DeviceRepositoryTests.cs and run the TestRunner
+```
+All 15 tests pass without external dependencies.```
 
 ## Project Structure
 
