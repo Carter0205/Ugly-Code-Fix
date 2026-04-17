@@ -1,29 +1,29 @@
-# Ugly Code Refactoring
+# Ugly Code Fix
 
-## What This Is
+Console application for controlling simulation devices (fans, heaters, sensors).
 
-Refactored the Ugly Code console application to use the Repository Pattern. It communicates with the Version2 server simulator to control fans, heaters, and sensors.
+## Build and Run
 
-## How to Run
+```
+dotnet build
+dotnet run
+```
 
-1. Set both UglyClient and Version2 as startup projects
-2. Make sure Version2 startup is set to HTTPS
-3. Press Start
-4. Version2 will open in Chrome, UglyClient console will appear
-5. Use the menu to control fans, heaters, and read temperatures
+## Changes Made
 
-## What Changed
+## Project Structure
 
-- Separated HTTP communication from UI logic
-- Created IDeviceRepository interface
-- Added HttpDeviceRepository to talk to Version2
-- Added MockDeviceRepository for testing
-- Updated ConsoleUI to use the interface
+- `Program.cs` - Entry point
+- `ConsoleUI.cs` - User interface
+- `IDeviceRepository.cs` - Repository interface
+- `HttpDeviceRepository.cs` - HTTP client implementation
+- `MockDeviceRepository.cs` - Mock implementation for testing
+- `UnitTests.cs` - Unit tests with test runner
+- `PHASE1_ANALYSIS.md` - Analysis of original code design
+- `SPRINT_DOCUMENTATION.md` - Sprint planning and reviews
 
-## Tests
+## Files
 
-Run DeviceRepositoryTests.cs to verify all 15 tests pass. Tests work without Version2 running.
+See PHASE1_ANALYSIS.md for design analysis.
+See SPRINT_DOCUMENTATION.md for project planning.
 
-## Build
-
-Compiles with no errors. All original functionality works.
