@@ -1,43 +1,29 @@
-# Ugly-Code-Fix
-Ugly code to fix and make more presentable.
-Build and run
+# Ugly Code Refactoring
 
-Requirements: .NET 8 SDK
+## What This Is
 
-Build:
+Refactored the Ugly Code console application to use the Repository Pattern. It communicates with the Version2 server simulator to control fans, heaters, and sensors.
 
-- From the repository root run:
-  - dotnet build
+## How to Run
 
-Run the web server (Version2):
+1. Set both UglyClient and Version2 as startup projects
+2. Make sure Version2 startup is set to HTTPS
+3. Press Start
+4. Version2 will open in Chrome, UglyClient console will appear
+5. Use the menu to control fans, heaters, and read temperatures
 
-- In Visual Studio: set Version2 project as startup and run (F5) or use the Project launch profile (https/http).
-- Or from terminal:
-  - cd "..\..\..\Desktop\Software Engineering Component 2 Hand in\Version2Sim-master\Version2Sim-master"
-  - dotnet run
+## What Changed
 
-Run the console client (UglyClient):
+- Separated HTTP communication from UI logic
+- Created IDeviceRepository interface
+- Added HttpDeviceRepository to talk to Version2
+- Added MockDeviceRepository for testing
+- Updated ConsoleUI to use the interface
 
-- Ensure the web server is running and note the listening URL printed (e.g. https://localhost:7021).
-- Set environment variable VERSION2_URL to the web server base address if it differs from the default.
-  - PowerShell: $env:VERSION2_URL = 'https://localhost:7021/'
-- From repo root run:
-  - dotnet run --project UglyClient.csproj
+## Tests
 
-Automatic browser opening:
+Run DeviceRepositoryTests.cs to verify all 15 tests pass. Tests work without Version2 running.
 
-- The console client will poll the web server's /swagger endpoint and open the default browser when reachable. Use VERSION2_URL to match the web project's listening port.
+## Build
 
-Tests (minimal harness):
-
-- A small test runner is provided at UnitTestRunner. Run:
-  - dotnet run --project UnitTestRunner
-
-What I changed (summary):
-- Separated Program into ApiClient and ConsoleUI
-- Consolidated device display and sensor parsing
-- Added XML documentation generation in csproj
-- Added a minimal test harness (UnitTestRunner), PlantUML diagram, sprint reviews and documentation files.
-
-Notes for marker:
-- The project targets .NET 8. Build and run instructions are above. If HTTPS warnings appear, run dotnet dev-certs https --trust.
+Compiles with no errors. All original functionality works.

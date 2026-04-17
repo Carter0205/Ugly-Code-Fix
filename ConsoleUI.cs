@@ -2,17 +2,25 @@ using System;
 using System.Threading.Tasks;
 
 /// <summary>
-/// Console UI separated from Program logic for easier testing and clearer structure.
+/// Console user interface for controlling the simulation.
+/// Uses IDeviceRepository abstraction to remain independent of implementation details.
 /// </summary>
 public class ConsoleUI
 {
-    private readonly ApiClient _api;
+    private readonly IDeviceRepository _repository;
 
-    public ConsoleUI(ApiClient api)
+    /// <summary>
+    /// Create a new ConsoleUI using the provided repository.
+    /// </summary>
+    /// <param name="repository">Device repository to use for operations</param>
+    public ConsoleUI(IDeviceRepository repository)
     {
-        _api = api ?? throw new ArgumentNullException(nameof(api));
+        _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
+    /// <summary>
+    /// Run the main menu loop.
+    /// </summary>
     public async Task RunAsync()
     {
         while (true)
@@ -39,7 +47,7 @@ public class ConsoleUI
                     await HandleReadTemperature();
                     break;
                 case "4":
-                    await _api.DisplayAllDevices();
+                    await _repository.DisplayAllDevicesAsync();
                     break;
                 case "5":
                     await HandleControlSimulation();
@@ -47,9 +55,9 @@ public class ConsoleUI
                 case "6":
                     try
                     {
-                        await _api.Reset();
+                        await _repository.ResetAsync();
                         Console.WriteLine("Client state has been successfully reset.");
-                        await _api.DisplayAllDevices();
+                        await _repository.DisplayAllDevicesAsync();
                     }
                     catch (Exception ex)
                     {
@@ -76,7 +84,7 @@ public class ConsoleUI
 
             try
             {
-                await _api.SetFanState(fanId, isOn);
+                await _repository.SetFanStateAsync(fanId, isOn);
                 Console.WriteLine($"Fan {fanId} has been turned {(isOn ? "On" : "Off")}.\n");
             }
             catch (Exception ex)
@@ -100,7 +108,7 @@ public class ConsoleUI
             {
                 try
                 {
-                    await _api.SetHeaterLevel(heaterId, level);
+                    await _repository.SetHeaterLevelAsync(heaterId, level);
                     Console.WriteLine($"Heater {heaterId} level set to {level}.\n");
                 }
                 catch (Exception ex)
@@ -126,7 +134,7 @@ public class ConsoleUI
         {
             try
             {
-                double temperature = await _api.GetSensorTemperature(sensorId);
+                double temperature = await _repository.GetSensorTemperatureAsync(sensorId);
                 Console.WriteLine($"Sensor {sensorId} Temperature: {temperature:F1}°C");
             }
             catch (Exception ex)
@@ -143,15 +151,14 @@ public class ConsoleUI
     private async Task HandleControlSimulation()
     {
         Console.WriteLine("Starting temperature control algorithm...");
-        Console.Write("Provide a final Temp Value: ");
-        double currentTemperature = await _api.GetAverageTemperature();
+        double currentTemperature = await _repository.GetAverageTemperatureAsync();
         while (true)
         {
-            currentTemperature = await _api.AdjustTemperature(currentTemperature, 20.0, 30);
-            currentTemperature = await _api.AdjustTemperature(currentTemperature, 16.0, 10);
-            currentTemperature = await _api.HoldTemperature(currentTemperature, 16.0, 10);
-            currentTemperature = await _api.AdjustTemperature(currentTemperature, 18.0, 20);
-            currentTemperature = await _api.HoldTemperature(currentTemperature, 18.0, int.MaxValue);
+            currentTemperature = await _repository.AdjustTemperatureAsync(currentTemperature, 20.0, 30);
+            currentTemperature = await _repository.AdjustTemperatureAsync(currentTemperature, 16.0, 10);
+            currentTemperature = await _repository.HoldTemperatureAsync(currentTemperature, 16.0, 10);
+            currentTemperature = await _repository.AdjustTemperatureAsync(currentTemperature, 18.0, 20);
+            currentTemperature = await _repository.HoldTemperatureAsync(currentTemperature, 18.0, int.MaxValue);
         }
     }
 }

@@ -5,24 +5,23 @@ using System.Globalization;
 using System.Threading.Tasks;
 
 /// <summary>
-/// Simple API client wrapping the HTTP calls used by the console UI.
+/// HTTP-based implementation of the device repository.
+/// Communicates with the Version2 ASP.NET Core web API to control devices and read state.
 /// </summary>
-public class ApiClient
+public class HttpDeviceRepository : IDeviceRepository
 {
     private readonly HttpClient _client;
 
     /// <summary>
-    /// Create a new ApiClient using the provided HttpClient instance.
+    /// Create a new HttpDeviceRepository using the provided HttpClient.
     /// </summary>
-    public ApiClient(HttpClient client)
+    /// <param name="client">HttpClient configured with base address and credentials</param>
+    public HttpDeviceRepository(HttpClient client)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
     }
 
-    /// <summary>
-    /// Get a single sensor temperature as a double.
-    /// </summary>
-    public async Task<double> GetSensorTemperature(int sensorId)
+    public async Task<double> GetSensorTemperatureAsync(int sensorId)
     {
         var response = await _client.GetAsync($"api/sensor/{sensorId}");
         if (response.IsSuccessStatusCode)
@@ -42,22 +41,16 @@ public class ApiClient
         throw new Exception($"Failed to get temperature from sensor {sensorId}: {response.ReasonPhrase}");
     }
 
-    /// <summary>
-    /// Calculate the average temperature across sensors 1..3.
-    /// </summary>
-    public async Task<double> GetAverageTemperature()
+    public async Task<double> GetAverageTemperatureAsync()
     {
-        var s1 = await GetSensorTemperature(1);
-        var s2 = await GetSensorTemperature(2);
-        var s3 = await GetSensorTemperature(3);
+        var s1 = await GetSensorTemperatureAsync(1);
+        var s2 = await GetSensorTemperatureAsync(2);
+        var s3 = await GetSensorTemperatureAsync(3);
 
         return (s1 + s2 + s3) / 3.0;
     }
 
-    /// <summary>
-    /// Set heater level for a heater.
-    /// </summary>
-    public async Task SetHeaterLevel(int heaterId, int level)
+    public async Task SetHeaterLevelAsync(int heaterId, int level)
     {
         var response = await _client.PostAsync($"api/heat/{heaterId}",
             new StringContent(level.ToString(), System.Text.Encoding.UTF8, "application/json"));
@@ -67,10 +60,7 @@ public class ApiClient
         }
     }
 
-    /// <summary>
-    /// Set fan state for a fan.
-    /// </summary>
-    public async Task SetFanState(int fanId, bool isOn)
+    public async Task SetFanStateAsync(int fanId, bool isOn)
     {
         var response = await _client.PostAsync($"api/fans/{fanId}",
             new StringContent(isOn.ToString().ToLower(), System.Text.Encoding.UTF8, "application/json"));
@@ -80,32 +70,23 @@ public class ApiClient
         }
     }
 
-    /// <summary>
-    /// Set all heaters to a level.
-    /// </summary>
-    public async Task SetAllHeaters(int level)
+    public async Task SetAllHeatersAsync(int level)
     {
         for (int i = 1; i <= 3; i++)
         {
-            await SetHeaterLevel(i, level);
+            await SetHeaterLevelAsync(i, level);
         }
     }
 
-    /// <summary>
-    /// Set all fans on/off.
-    /// </summary>
-    public async Task SetAllFans(bool state)
+    public async Task SetAllFansAsync(bool state)
     {
         for (int i = 1; i <= 3; i++)
         {
-            await SetFanState(i, state);
+            await SetFanStateAsync(i, state);
         }
     }
 
-    /// <summary>
-    /// Display the state of fans, heaters and sensors to the console.
-    /// </summary>
-    public async Task DisplayAllDevices()
+    public async Task DisplayAllDevicesAsync()
     {
         Console.WriteLine("Fetching fan states individually...");
         for (int i = 1; i <= 3; i++)
@@ -151,11 +132,11 @@ public class ApiClient
         Console.WriteLine("Fetching sensor temperatures individually...");
         try
         {
-            var s1 = await GetSensorTemperature(1);
+            var s1 = await GetSensorTemperatureAsync(1);
             Console.WriteLine($"  Sensor 1: Temperature {s1} (Deg)");
-            var s2 = await GetSensorTemperature(2);
+            var s2 = await GetSensorTemperatureAsync(2);
             Console.WriteLine($"  Sensor 2: Temperature {s2} (Deg)");
-            var s3 = await GetSensorTemperature(3);
+            var s3 = await GetSensorTemperatureAsync(3);
             Console.WriteLine($"  Sensor 3: Temperature {s3} (Deg)");
         }
         catch (Exception ex)
@@ -164,10 +145,7 @@ public class ApiClient
         }
     }
 
-    /// <summary>
-    /// Reset the simulation on the server.
-    /// </summary>
-    public async Task Reset()
+    public async Task ResetAsync()
     {
         var response = await _client.PostAsync("api/Envo/reset", null);
         if (!response.IsSuccessStatusCode)
@@ -176,10 +154,7 @@ public class ApiClient
         }
     }
 
-    /// <summary>
-    /// Adjust temperature towards a target over a duration (seconds).
-    /// </summary>
-    public async Task<double> AdjustTemperature(double currentTemperature, double targetTemperature, int durationSeconds)
+    public async Task<double> AdjustTemperatureAsync(double currentTemperature, double targetTemperature, int durationSeconds)
     {
         int intervalMs = 1000;
         int iterations = durationSeconds;
@@ -189,44 +164,41 @@ public class ApiClient
 
             if (currentTemperature < targetTemperature)
             {
-                await SetAllHeaters(3);
-                await SetAllFans(false);
+                await SetAllHeatersAsync(3);
+                await SetAllFansAsync(false);
             }
             else
             {
-                await SetAllHeaters(0);
-                await SetAllFans(true);
+                await SetAllHeatersAsync(0);
+                await SetAllFansAsync(true);
             }
 
             await Task.Delay(intervalMs);
-            currentTemperature = await GetAverageTemperature();
+            currentTemperature = await GetAverageTemperatureAsync();
             Console.WriteLine($"Current Temperature: {currentTemperature:F1}°C");
         }
 
         return currentTemperature;
     }
 
-    /// <summary>
-    /// Hold temperature at target for duration (seconds).
-    /// </summary>
-    public async Task<double> HoldTemperature(double currentTemperature, double targetTemperature, int durationSeconds)
+    public async Task<double> HoldTemperatureAsync(double currentTemperature, double targetTemperature, int durationSeconds)
     {
         int intervalMs = 1000;
         for (int i = 0; i < durationSeconds; i++)
         {
             if (currentTemperature < targetTemperature)
             {
-                await SetAllHeaters(1);
-                await SetAllFans(false);
+                await SetAllHeatersAsync(1);
+                await SetAllFansAsync(false);
             }
             else if (currentTemperature > targetTemperature)
             {
-                await SetAllHeaters(0);
-                await SetAllFans(true);
+                await SetAllHeatersAsync(0);
+                await SetAllFansAsync(true);
             }
 
             await Task.Delay(intervalMs);
-            currentTemperature = await GetAverageTemperature();
+            currentTemperature = await GetAverageTemperatureAsync();
             Console.WriteLine($"Current Temperature: {currentTemperature:F1}°C");
         }
 
@@ -234,6 +206,9 @@ public class ApiClient
     }
 }
 
+/// <summary>
+/// DTO for fan state responses from the API.
+/// </summary>
 public class FanDTO
 {
     public int Id { get; set; }

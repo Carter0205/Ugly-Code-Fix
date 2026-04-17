@@ -1,0 +1,87 @@
+@startuml architecture
+!theme plain
+
+package "UglyClient (Console Application)" {
+    class Program {
+        +Main(args: string[])
+    }
+
+    interface IDeviceRepository {
+        +GetSensorTemperatureAsync(sensorId: int): Task<double>
+        +GetAverageTemperatureAsync(): Task<double>
+        +SetHeaterLevelAsync(heaterId: int, level: int): Task
+        +SetFanStateAsync(fanId: int, isOn: bool): Task
+        +DisplayAllDevicesAsync(): Task
+        +ResetAsync(): Task
+    }
+
+    class HttpDeviceRepository {
+        -_client: HttpClient
+        +GetSensorTemperatureAsync(sensorId: int): Task<double>
+        +GetAverageTemperatureAsync(): Task<double>
+        +SetHeaterLevelAsync(heaterId: int, level: int): Task
+        +SetFanStateAsync(fanId: int, isOn: bool): Task
+        +DisplayAllDevicesAsync(): Task
+        +ResetAsync(): Task
+    }
+
+    class ConsoleUI {
+        -_repository: IDeviceRepository
+        +RunAsync(): Task
+        -HandleControlFan(): Task
+        -HandleControlHeater(): Task
+        -HandleReadTemperature(): Task
+    }
+
+    Program --> ConsoleUI : uses
+    Program --> IDeviceRepository : creates
+    Program --> HttpDeviceRepository : instantiates
+    ConsoleUI --> IDeviceRepository : depends on
+    HttpDeviceRepository ..|> IDeviceRepository : implements
+}
+
+package "Version2 (ASP.NET Core Web API)" {
+    class FansController {
+        +GetFanState(id: int): ActionResult
+        +SetFanState(id: int, state: bool): ActionResult
+    }
+
+    class HeaterController {
+        +GetHeaterLevel(id: int): ActionResult
+        +SetHeaterLevel(id: int, level: int): ActionResult
+    }
+
+    class SensorController {
+        +GetSensorTemperature(id: int): ActionResult
+    }
+
+    class SystemStateController {
+        +GetSystemState(): ActionResult
+    }
+
+    class EnviromentController {
+        +Reset(): ActionResult
+    }
+
+    class EnvironmentUpdater {
+        +Update(): void
+    }
+
+    class SimulationConfiguration {
+        +Sensors: TemperatureSensor[]
+        +Fans: FanControl[]
+        +Heaters: HeaterControl[]
+    }
+}
+
+HttpDeviceRepository --> FansController : HTTP calls
+HttpDeviceRepository --> HeaterController : HTTP calls
+HttpDeviceRepository --> SensorController : HTTP calls
+HttpDeviceRepository --> EnviromentController : HTTP calls
+
+FansController --> SimulationConfiguration : accesses
+HeaterController --> SimulationConfiguration : accesses
+SensorController --> SimulationConfiguration : accesses
+EnviromentController --> SimulationConfiguration : modifies
+
+@enduml
