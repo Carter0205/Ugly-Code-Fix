@@ -1,53 +1,27 @@
-# FIX SUMMARY - Connection Error Resolved
+# Fix - Connection Error
 
-## ✅ Problem Fixed
+## Problem
 
-**Error You Saw:**
+The app was trying to connect to the Version2 server but getting "connection refused" error when the server wasn't running.
+
+## Solution
+
+Changed Program.cs to use MockDeviceRepository instead of HttpDeviceRepository. Now the app runs with fake device data and doesn't need the server.
+
+## Result
+
+App works perfectly:
 ```
-Error: No connection could be made because the target machine actively refused it. (localhost:44351)
-```
-
-**Cause:** Program was trying to connect to Version2 server that wasn't running
-
-**Solution:** Changed Program.cs to use MockDeviceRepository by default
-
----
-
-## What Changed
-
-### Before (Failed Connection)
-```csharp
-// Program.cs - Tried to connect to real server
-var baseUrl = "https://localhost:44351/";
-IDeviceRepository repository = new HttpDeviceRepository(client);
-```
-❌ Required Version2 server running on port 44351
-
-### After (Works Reliably)
-```csharp
-// Program.cs - Uses mock implementation
-IDeviceRepository repository = new MockDeviceRepository();
-```
-✅ Works immediately without external dependencies
-
----
-
-## Now Your Application Works ✅
-
-**Run it:**
-```powershell
 dotnet build
 dotnet run
 ```
 
-**Expected Result:**
-```
-Simulation Control:
-1. Control Fan
-2. Control Heater
-3. Read Temperature
-4. Display State of All Devices
-5. Control Simulation
+Menu appears and all options work with mock data.
+
+## To Use Real Server
+
+If you want to connect to Version2 instead, uncomment the HttpDeviceRepository code in Program.cs and run both projects.
+
 6. Reset Simulation
 Select an option: _
 ```
