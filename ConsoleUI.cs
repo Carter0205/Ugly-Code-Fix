@@ -1,10 +1,6 @@
 using System;
 using System.Threading.Tasks;
 
-/// <summary>
-/// Console user interface for controlling the simulation.
-/// Uses IDeviceRepository abstraction to remain independent of implementation details.
-/// </summary>
 public class ConsoleUI
 {
     private const int MinSensorId = 1;
@@ -18,18 +14,11 @@ public class ConsoleUI
 
     private readonly IDeviceRepository _repository;
 
-    /// <summary>
-    /// Create a new ConsoleUI using the provided repository.
-    /// </summary>
-    /// <param name="repository">Device repository to use for operations</param>
     public ConsoleUI(IDeviceRepository repository)
     {
         _repository = repository ?? throw new ArgumentNullException(nameof(repository));
     }
 
-    /// <summary>
-    /// Run the main menu loop.
-    /// </summary>
     public async Task RunAsync()
     {
         while (true)
