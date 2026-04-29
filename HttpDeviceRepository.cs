@@ -4,10 +4,6 @@ using System.Text.Json;
 using System.Globalization;
 using System.Threading.Tasks;
 
-/// <summary>
-/// HTTP-based implementation of the device repository.
-/// Communicates with the Version2 ASP.NET Core web API to control devices and read state.
-/// </summary>
 public class HttpDeviceRepository : IDeviceRepository
 {
     private const int DeviceCount = 3;
@@ -21,10 +17,6 @@ public class HttpDeviceRepository : IDeviceRepository
 
     private readonly HttpClient _client;
 
-    /// <summary>
-    /// Create a new HttpDeviceRepository using the provided HttpClient.
-    /// </summary>
-    /// <param name="client">HttpClient configured with base address and credentials</param>
     public HttpDeviceRepository(HttpClient client)
     {
         _client = client ?? throw new ArgumentNullException(nameof(client));
@@ -246,9 +238,6 @@ public class HttpDeviceRepository : IDeviceRepository
     }
 }
 
-/// <summary>
-/// DTO for fan state responses from the API.
-/// </summary>
 public class FanDTO
 {
     public int Id { get; set; }

@@ -2,10 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-/// <summary>
-/// Mock implementation of the device repository for unit testing.
-/// Simulates device behavior without requiring a running web server.
-/// </summary>
 public class MockDeviceRepository : IDeviceRepository
 {
     private const int MinSensorId = 1;
@@ -102,7 +98,6 @@ public class MockDeviceRepository : IDeviceRepository
     public async Task<double> AdjustTemperatureAsync(double currentTemperature, double targetTemperature, int durationSeconds)
     {
         CallLog.Add($"AdjustTemperatureAsync({currentTemperature}, {targetTemperature}, {durationSeconds})");
-        // Simulate temperature change towards target
         double direction = targetTemperature > currentTemperature ? 0.5 : -0.5;
         return currentTemperature + (direction * durationSeconds / 10.0);
     }
@@ -110,7 +105,6 @@ public class MockDeviceRepository : IDeviceRepository
     public async Task<double> HoldTemperatureAsync(double currentTemperature, double targetTemperature, int durationSeconds)
     {
         CallLog.Add($"HoldTemperatureAsync({currentTemperature}, {targetTemperature}, {durationSeconds})");
-        // Simulate small fluctuations around target
         return currentTemperature + (new Random().NextDouble() - 0.5);
     }
 }
